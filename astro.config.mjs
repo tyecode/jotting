@@ -10,5 +10,6 @@ export default defineConfig({
   alias: {
     "@": "./src",
   },
+  output: "server",
   integrations: [mdx(), sitemap(), tailwind()],
 });

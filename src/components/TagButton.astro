@@ -1,0 +1,16 @@
+---
+const { onClick, isHover, className, ...props } = Astro.props;
+---
+
+<button
+  class:list={[
+    className,
+    isHover && "hover:bg-neutral-400 hover:text-black",
+    "bg-neutral-800 text-neutral-400 font-bold py-2 px-4 rounded-lg",
+    "font-normal text-inter text-sm duration-150 group",
+  ]}
+  onclick={onClick}
+  {...props}
+>
+  <slot />
+</button>

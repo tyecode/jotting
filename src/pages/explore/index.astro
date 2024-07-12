@@ -1,0 +1,79 @@
+---
+import { getCollection } from "astro:content";
+
+import BaseHead from "@/components/BaseHead.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import TagButton from "@/components/TagButton.astro";
+
+import { SITE_TITLE, SITE_DESCRIPTION } from "@/consts";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const tags = posts
+  .flatMap((post) => post.data.tags || [])
+  .reduce((acc: { name: string; amount: number }[], tag) => {
+    const existingTag = acc.find((t) => t.name === tag);
+    existingTag ? existingTag.amount++ : acc.push({ name: tag, amount: 1 });
+    return acc;
+  }, []);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section class="container">
+        <h1 class="text-6xl font-bold font-inter">Explore</h1>
+        <p class="text-xl my-4 font-inter">
+          Discover your way through with our guides.
+        </p>
+      </section>
+      <section class="container py-6 pt-8 flex flex-col gap-4">
+        <span class="text-xs font-inter uppercase text-accent font-normal">
+          Guides by Tag
+        </span>
+        <div class="flex gap-2 flex-wrap">
+          <a href={`/blog?explore=`} class="no-underline hover:no-underline">
+            <TagButton
+              className="flex items-center gap-2 whitespace-nowrap"
+              isHover
+            >
+              <span class="text-inter group-hover:text-black"> All </span>
+              <span class="text-accent font-inter group-hover:text-black">
+                {posts.length}
+              </span>
+            </TagButton>
+          </a>
+          {
+            tags.map((tag) => (
+              <a
+                href={`/blog?explore=${tag.name.toLowerCase().replace(/\s+/g, "-")}`}
+                class="no-underline hover:no-underline"
+              >
+                <TagButton
+                  className="flex items-center gap-2 whitespace-nowrap"
+                  isHover
+                >
+                  <span class="text-inter group-hover:text-black">
+                    {tag.name}
+                  </span>
+                  <span class="text-accent font-inter group-hover:text-black">
+                    {tag.amount}
+                  </span>
+                </TagButton>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
